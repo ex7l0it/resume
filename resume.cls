@@ -54,6 +54,7 @@
   \RequirePackage{xeCJK}
 }{}
 \RequirePackage{microtype}
+\RequirePackage{tabularx}
 
 %
 % Hyperref
@@ -84,7 +85,7 @@
 
 % Chinese setup
 \ifdef{\@zh}{
-  \setCJKmainfont{Noto Serif CJK SC}
+  \setCJKmainfont{Source Han Serif CN}
   % Redefine '\emph' to bold style
   % Credit: https://tex.stackexchange.com/a/227644
   \let\emph\relax  % there's no \RedeclareTextFontCommand
@@ -232,13 +233,13 @@
 % Render a text with its icon
 % Usage: \icontext{<icon>}{<label>}
 \newcommand*{\icontext}[2]{%
-  \mbox{\icon{#1} #2 \hspace{1em}}%
+  \mbox{\icon[\small]{#1} #2 \hspace{1em}}%
 }
 
 % Render a link with its icon and text
 % Usage: \iconlink{<icon>}{<label>}{<text>}
 \newcommand*{\iconlink}[3]{%
-  \mbox{\icon{#1} \link{#2}{#3} \hspace{1em}}%
+  \mbox{\icon[\small]{#1} \link{#2}{#3} \hspace{1em}}%
 }
 
 % Name: \name{<firstname>}{<lastname>}
@@ -247,8 +248,8 @@
   \def\@lastname{#2}
   \def\@name{%
     \ifdef{\@zh}%
-      {\@lastname\@firstname}%
-      {\textsc{\@firstname} \@lastname}%
+      {\@lastname\space\@firstname}%
+      {\textsc{\@firstname}\space\@lastname}%
   }
 }
 % Tag line
@@ -266,24 +267,33 @@
 \define@key{photo}{shape}{\def\@photo@shape{#1}}
 \define@key{photo}{position}{\def\@photo@position{#1}}
 \NewDocumentCommand{\photo}{
-  O{shape=circular, position=left}
+  O{shape=rectangle, position=right}
   m m
 }{
   \setkeys{photo}{#1}
   \def\@photo@width{#2}
   \def\@photo{%
     \begin{minipage}{\@photo@width}
-      \ifdefstring{\@photo@shape}{square}{%
+      \ifdefstring{\@photo@shape}{rectangle}{%
         \tikz\path[fill overzoom image={#3}]
-          rectangle (\linewidth, \linewidth);% (suppress blank)
+          rectangle (\linewidth, 1.4\linewidth);% (suppress blank)
       }{%
         \tikz\path[fill overzoom image={#3}]
           circle[radius=0.5\linewidth];% (suppress blank)
       }%
     \end{minipage}% (suppress blank)
+    \hspace*{2em}% 添加右侧边距
   }
 }
 
+\ExplSyntaxOn
+\NewDocumentCommand{\basicinfo}{m}
+ {
+  \clist_set:Nn \l_tmpa_clist {#1}
+  \clist_use:Nn \l_tmpa_clist { \quad|\quad }
+  \par
+ }
+\ExplSyntaxOff
 % Address
 \newcommand*{\address}[1]{\icontext{\locationSymbol}{#1}}
 % Birthday
@@ -371,7 +381,7 @@
 \newcommand*{\sectionTitle}[2]{%
   \section{%
     \texorpdfstring%
-      {\color{accentcolor}{\icon{#2} \textbf{#1}}}%
+      {\color{accentcolor}{\icon[\Large]{#2} \textbf{#1}}}%
       {#1}%
   }
 }
@@ -423,27 +433,32 @@
 %% Section: educations
 %%
 
+% 内部存放 \education 组成的教育背景信息
 \NewDocumentEnvironment{educations}{}{%
-  \begin{tabular}{R{\leftcolwidth} | L{\rightcolwidth}}
+    \begin{itemize}[leftmargin=*, label={}]
 }{%
-  \end{tabular}
+    \end{itemize}
 }
 
-% \education
-%   {<start-date>}  % #1
-%   [<end-date>]    % #2
-%   {<school>}      % #3
-%   {<department>}  % #4
-%   {<major>}       % #5
-%   {<degree>}      % #6
-\NewDocumentCommand{\education}{m o m m m m}{
-  \ifdef{\@zh}{%
-    \IfValueTF{#2}{#2}{现在} & \textbf{#3} \textbullet #4 \\*
-    #1 & #5 \textbullet #6 \\
-  }{%
-    \IfValueTF{#2}{#2}{present} & #4, \textbf{#3} \\*
-    #1 & #6 in #5 \\
-  }
+% \education 命令（替代原来的 \EducationExperience），参数说明：
+%   #1：学校名称（左侧加粗显示）
+%   #2：起始日期
+%   #3：终止日期 [可选，默认为“至今”]
+%   #4：专业等信息（一个列表，用·拼接）
+\ExplSyntaxOn
+\NewDocumentCommand{\education}{m m o m}{%
+    \item \textbf{#1} \hfill \IfNoValueTF{#3}{#2 - 至今}{#2 - #3} \\
+    \seq_set_split:Nnn \l_tmpa_seq {,} {#4}
+    \seq_use:Nn \l_tmpa_seq { \textbullet\, }
+}
+\ExplSyntaxOff
+
+\NewDocumentCommand{\EducationExperience}{ m m m m o }{%
+    \textbf{\,\,#1} \hfill #2 \\%
+    \setlength\tabcolsep{3pt}%
+    \begin{tabular}{lllll}
+        \multicolumn{3}{l}{#3 \textbullet\, #4 \IfValueT{#5}{\textbullet\, #5}}%
+    \end{tabular}%
 }
 
 %%
@@ -451,62 +466,22 @@
 %%
 
 \NewDocumentEnvironment{projects}{}{%
-  \begin{longtable}{R{\leftcolwidth} | L{\rightcolwidth}}
+  \begin{itemize}
 }{%
-  \end{longtable}
+  \end{itemize}
 }
 
 % \project
-%   {<start-date>}   % #1
-%   [<end-date>]     % #2
-%   {<department>}   % #3
-%   {<type>}         % #4
-%   {<name>}         % #5
-%   {<description>}  % #6
-%   [<tags>]         % #7
-\NewDocumentCommand{\project}{m o m m m m o}{
-  \multirowcell{2}[0ex][r]{%
-    \IfValueTF{#2}{#2}{\ifdef{\@zh}{现在}{present}} \\ #1%
-  }
-  & \textbf{#5} \\*
-  \ifdef{\@zh}{%
-    & #3 \textbullet #4 \\*
-  }{%
-    & #4, #3 \\*
-  }
-  & \begin{minipage}[t]{\rightcolwidth} #6 \end{minipage} \\*
-  \IfValueT{#7}{%
-    & \footnotesize{\tags{#7}} \\
-  }
-}
-
-%%
-%% Section: experiences
-%%
-
-\NewDocumentEnvironment{experiences}{}{%
-  \begin{longtable}{R{\leftcolwidth} | L{\rightcolwidth}}
-}{%
-  \end{longtable}
-}
-
-% \experience
-%   [<start-date>]   % #1
-%   {<end-date>}     % #2
-%   {<summary>}      % #3
-%   [<description>]  % #4
-%   [<tags>]         % #5
-\NewDocumentCommand{\experience}{o m m o o}{
-  #2 & #3 \\*
-  \IfValueT{#1}{#1}
-  \IfNoValueOrEmptyTF{#4}{}{%
-     & \begin{minipage}[t]{\rightcolwidth}
-         #4
-       \end{minipage} \\*
-  }
-  \IfValueT{#5}{%
-    & \footnotesize{\tags{#5}} \\
-  }
+%   
+\newcommand{\project}[3]{%
+    \item #1 \hfill #2\par%
+    \foreach \point [count=\i] in {#3}{%
+        \ifnum\i=1\relax
+            \textbullet\,\point%
+        \else
+            \newline \textbullet\,\point%
+        \fi%
+    }%
 }
 
 %%
@@ -541,6 +516,28 @@
       }
     } \enspace \\
 }
+
+%%
+%% Section: hornors
+%%
+
+\NewDocumentEnvironment{hornors}{}{%
+  \begin{itemize}
+}{%
+  \end{itemize}
+}
+
+\NewDocumentCommand{\honor}{ m o }{%
+    \IfNoValueTF{#2}{%
+        \item #1%
+    }{%
+        \item 
+        \begin{tabularx}{\linewidth}{@{}X r@{}} % X 表示左对齐可变宽度列，r 表示右对齐列
+        #1 & #2 \\
+        \end{tabularx}
+    }%
+}
+
 
 %%
 %% Section: referees

@@ -3,18 +3,15 @@ My Resume and LaTeX Template
 
 Introduction
 ------------
-This repository holds my [resume](resume-zh+en.pdf) (Chinese and English) and
-the [LaTeX template](resume.cls).
+本简历模板基于原仓库 https://github.com/liweitianux/resume 进行了一点点修改：
 
-The LaTeX template is based on the
-[YACC: Another Awesome CV](https://github.com/darwiin/yaac-another-awesome-cv)
-by Christophe Roger, which is further based on the
-[Plasmati Graduate CV](https://www.latextemplates.com/template/plasmati-graduate-cv)
-by Alessandro Plasmati.
+- 改了一点基本信息、实习、项目的样式，改了一下附加照片的高度，字体改用了思源宋体（Source Han Serif CN）
 
-This template is also available on
-[Overleaf](https://www.overleaf.com/latex/templates/simple-resume-template-for-new-graduate-ying-jie-sheng-jian-li-mo-ban/hxrntvmmvnqt).
-Welcome to try it and report back.
+- 模板信息由 AI 生成 🤔
+
+- 模板内容展示：
+
+<img src="https://raw.githubusercontent.com/ex7l0it/ImageHosting/master/Picture/Snipaste_2025-02-15_12-38-02.jpg" alt="Snipaste_2025-02-15_12-38-02" style="zoom:50%;" />
 
 Usage
 -----
@@ -48,7 +45,6 @@ The original [fontawesome5](fontawesome5/) contents are now obsolete but kept
 for reference.
 
 <blockquote>
-
 I wrote a simple tool [`make-fontawesome5.py`](fontawesome5/make-fontawesome5.py),
 which will download the latest icon list from the
 [Font Awesome](https://github.com/FortAwesome/Font-Awesome) project
@@ -115,6 +111,8 @@ opensource fonts:
   (Language Specific OTFs Simplified Chinese) from the
   [releases](https://github.com/notofonts/noto-cjk/releases) page,
   and then install all of them.
+
+- [思源宋体](https://source.typekit.com/source-han-serif/cn/)（Regular、Bold）
 
 On Debian Linux, simply do `apt install fonts-ibm-plex fonts-noto-cjk`.
 
