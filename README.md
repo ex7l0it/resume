@@ -11,10 +11,15 @@ Introduction
 
 - 模板内容展示：
 
-<img src="https://raw.githubusercontent.com/ex7l0it/ImageHosting/master/Picture/Snipaste_2025-02-15_12-38-02.jpg" alt="Snipaste_2025-02-15_12-38-02" style="zoom:50%;" />
+![](https://raw.githubusercontent.com/ex7l0it/ImageHosting/master/Picture/Snipaste_2025-02-15_12-38-02.jpg)
+
+> 关于写简历 👉 [程序员如何写好一份简历](https://www.v2ex.com/t/989645)
+
+
 
 Usage
 -----
+
 * Linux
 
   1. Install XeLaTeX, latexmk, GNU Make, and GhostScript packages;
